@@ -1,0 +1,34 @@
+/*
+
+  DUE: April 20, 2025 [Sunday]
+  
+  1. user message + file input (Gregory + Letzy)
+  
+  2. decode (Jonathan)
+  
+  3. simulate
+    - LW (Ghare)
+    - SW (Ghare)
+    - ADD (Carolina)
+    - ADDI (Carolina)
+    - SUB (Jonathan)
+    - SLT (Gregory)
+    - BEQ (Letzy)
+    - BNE (Katrina)
+    
+  4. user message + file output (Katrina)
+
+  CODING DONE BY APRIL 13, 2025
+
+  5. report (all)
+  6. slides (all)
+
+  DOCUMENTATION DONE BY APRIL 20, 2025
+  
+*/
+
+#include <iostream>
+
+int main() { 
+  std::cout << "Hello World!\n"; 
+}
