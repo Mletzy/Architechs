@@ -4,9 +4,65 @@
 #include "instruction.h"
 
 // Placeholder: to be edited later
-void runSimulation(const std::unordered_map<int, int> &registers, const std::unordered_map<int, int> &memory, const std::vector<Instruction> &instructions)
+void runSimulation(const std::unordered_map<int, int> &registers, 
+                   const std::unordered_map<int, int> &memory, 
+                   const std::vector<Instruction> &instructions)
 {
     std::cout << "\nSIMULATION START\n";
+
+    int cycle = 1; // Tracks the clock cycle
+    int pc = 0;    // Program counter (index of instruction)
+
+    std::vector<std::string> timeline; // Store cycle-by-cycle execution
+
+    while (pc < instructions.size()) 
+    {
+        Instruction inst = instructions[pc];
+
+        // Log cycles
+        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-IF");
+        cycle++;
+        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-ID");
+        cycle++;
+
+        // Execute instruction
+        switch (inst.opcode) 
+        {
+            case 5: // BNE (opcode = 000101)
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
+                cycle++;
+                /*
+                if (registers[inst.rs] != registers[inst.rt]) {
+                    pc += inst.immediate; // Branch
+                }
+                */
+                break;
+        }
+
+        cycle++;
+        pc++; // Move to the next instruction
+    }
+
+    // Print timeline
+    for (const auto &entry : timeline) {
+      std::cout << entry << std::endl;
+    }
+
+    // Print final register contents
+    std::cout << "\nREGISTERS\n";
+    for (const auto &reg : registers) {
+        if (reg.second != 0) {
+            std::cout << "R" << reg.first << " " << reg.second << "\n";
+        }
+    }
+
+    // Print final memory contents
+    std::cout << "\nMEMORY\n";
+    for (const auto &mem : memory) {
+        if (mem.second != 0) {
+            std::cout << mem.first << " " << mem.second << "\n";
+        }
+    }
 
     // Just print out the decoded instructions for now
     for (const auto &inst : instructions)
