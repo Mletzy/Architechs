@@ -28,6 +28,15 @@ void runSimulation(const std::unordered_map<int, int> &registers,
         // Execute instruction
         switch (inst.opcode) 
         {
+            case 4: // BEQ (opcode = 000100)
+              /*
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
+                cycle++;
+                if (registers[inst.rs] == registers[inst.rt]) {
+                pc += inst.immediate; // Branch if equal
+                }
+                break;
+              */
             case 5: // BNE (opcode = 000101)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 cycle++;
