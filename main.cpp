@@ -28,6 +28,13 @@ void runSimulation(const std::unordered_map<int, int> &registers,
         // Execute instruction
         switch (inst.opcode) 
         {
+          case 0: //(opcode = 000000) For R-type instructions
+            /*if( ) //ADD (funct= 100000)
+             //rd register will contain rs value +rt value
+
+            */
+
+          break;
             case 4: // BEQ (opcode = 000100)
               /*
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
@@ -46,6 +53,17 @@ void runSimulation(const std::unordered_map<int, int> &registers,
                 }
                 */
                 break;
+            case 8: //ADDI (opcode = 001000)
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
+                cycle++;
+              /*
+              //rd = rs + imm
+
+
+                */
+              
+                break;
+          
         }
 
         cycle++;
