@@ -33,6 +33,9 @@ void runSimulation(const std::unordered_map<int, int> &registers,
              //rd register will contain rs value + rt value
                registers[inst.rd] = registers[inst.rs] + registers[inst.rt];
                }
+               else if( inst.funct == 34 ) {//SUB (funct= 100010) -Jonathan Arc
+               registers[inst.rd] = registers[inst.rs] - registers[inst.rt];
+               }               
             */
 
           break;
