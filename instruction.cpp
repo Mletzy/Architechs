@@ -15,17 +15,37 @@ Instruction::Instruction(const std::string &binary, int idx) : raw(binary), inde
     decode();
 }
 
+
+// Helper function for converting binary strings to integers as part of decode(). -Jonathan Arc
+unsigned int binToDec(const std::string& bin, int start, int end) { // Converts binary string into integer value
+    unsigned int value = 0;
+    for (int i = start; i <= end; i++) {
+        value = (value << 1) | (bin[i] - '0'); // Combines shifted left binary with next binary digit. Note: '0'-'0'=0 and '1'-'0'=1
+    }
+    return value;
+}
+
+
 // Decodes a 32-bit binary string into R-type or I-type fields
-/* TODO */
 void Instruction::decode()
 {
     opcode = std::stoi(raw.substr(0, 6), nullptr, 2); // First 6 bits = opcode
 
-    // R-type instruction (opcode = 0)
-    // I-type instruction
-    // sign-extend 16-bit immediate if it's negative (starts with '1')
-    if (raw[16] == '1')
-    {
-        // Extend to 32-bit signed value
+    if(opcode == 0x00){        // R-type instruction (opcode = 0)
+        rs = binToDec(raw, 6, 10);
+        rt = binToDec(raw, 11, 15);
+        rd = binToDec(raw, 16, 20);
+        shamt = binToDec(raw, 21, 25);
+        func = binToDec(raw, 26, 31);
+
+    	}
+    else{					// I-type instruction
+        rs = binToDec(raw, 6, 10);
+        rt = binToDec(raw, 11, 15);
+        immediate = binToDec(raw, 16, 31);
+    	}
+
+    if (raw[16] == '1'){    // sign-extend 16-bit immediate if it's negative (starts with '1')        
+        immediate = (short)immediate; //cast to signed value
     }
 }
