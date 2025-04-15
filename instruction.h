@@ -10,9 +10,15 @@ struct Instruction
     std::string type; // Type of instruction
     int index;        // Instruction number
 
-    /* TODO */
-    // Fields extracted from the binary instruction
+    // Fields extracted from the binary instruction  -Jonathan Arc
     int opcode = 0;
+    int rs;
+    int rd;
+    int rt;
+    int shamt;
+    int func;
+    int immediate;
+
     // Constructor: takes binary string + instruction ndex and immediately decodes it
     Instruction(const std::string &binary, int idx);
 
