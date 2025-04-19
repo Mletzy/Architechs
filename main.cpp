@@ -4,8 +4,9 @@
 #include "instruction.h"
 
 // Placeholder: to be edited later
-void runSimulation(const std::unordered_map<int, int> &registers, 
-                   const std::unordered_map<int, int> &memory, 
+//G.G changed the const for registers and memory so I could directly access them in SW and LW
+void runSimulation( std::unordered_map<int, int> &registers, 
+                    std::unordered_map<int, int> &memory, 
                    const std::vector<Instruction> &instructions)
 {
     std::cout << "\nSIMULATION START\n";
@@ -66,6 +67,46 @@ void runSimulation(const std::unordered_map<int, int> &registers,
 
                 */
               
+                break;
+          case 35: //LW (opcode = 100011) 
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-MEM");
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-WB");
+                
+                cycle++;
+                /*
+                //rd = rs + imm;
+                 registers[inst.rd] = registers[inst.rs] + inst.immediate;
+
+                */
+                int offset = inst.immediate;
+                int effAdd = offset + registers[inst.rs];
+                if (effAdd % 4 != 0) {
+                    std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
+                    return;
+                }
+                registers[inst.rt] = memory[effAdd];
+                    
+                break;
+
+            case 43: //SW (opcode = 101011)
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-MEM");
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-WB");
+                cycle++;
+                /*
+                //rd = rs + imm;
+                 registers[inst.rd] = registers[inst.rs] + inst.immediate;
+
+                */
+
+                int offset = inst.immediate;
+                int effAdd = offset + registers[inst.rs];
+                if (effAdd % 4 != 0) {
+                    std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
+                    return;
+                }
+                memory[effAdd] = registers[inst.rd];
                 break;
           
         }
