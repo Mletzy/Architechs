@@ -104,7 +104,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
                     std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
                     return;
                 }
-                memory[effAdd] = registers[inst.rd];
+                memory[effAdd] = registers[inst.rt];
                 break;
           
         }
