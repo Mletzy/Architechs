@@ -1,15 +1,16 @@
 #include <iostream>
+#include <fstream>
 #include "parser.h"
 #include "decoder.h"
 #include "instruction.h"
 
-// Placeholder: to be edited later
 //G.G changed the const for registers and memory so I could directly access them in SW and LW
 void runSimulation( std::unordered_map<int, int> &registers, 
                     std::unordered_map<int, int> &memory, 
                    const std::vector<Instruction> &instructions)
 {
     std::cout << "\nSIMULATION START\n";
+    std::ofstream output("output.txt");
 
     int cycle = 1; // Tracks the clock cycle
     int pc = 0;    // Program counter (index of instruction)
@@ -52,11 +53,9 @@ void runSimulation( std::unordered_map<int, int> &registers,
             case 5: // BNE (opcode = 000101)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 cycle++;
-                /*
                 if (registers[inst.rs] != registers[inst.rt]) {
                     pc += inst.immediate; // Branch
                 }
-                */
                 break;
             case 8: //ADDI (opcode = 001000)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
@@ -99,7 +98,6 @@ void runSimulation( std::unordered_map<int, int> &registers,
                  registers[inst.rd] = registers[inst.rs] + inst.immediate;
 
                 */
-
                 int offset = inst.immediate;
                 int effAdd = offset + registers[inst.rs];
                 if (effAdd % 4 != 0) {
@@ -110,7 +108,6 @@ void runSimulation( std::unordered_map<int, int> &registers,
                 break;
           
         }
-
         cycle++;
         pc++; // Move to the next instruction
     }
@@ -118,6 +115,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
     // Print timeline
     for (const auto &entry : timeline) {
       std::cout << entry << std::endl;
+      output << entry << std::endl;
     }
 
     // Print final register contents
@@ -125,6 +123,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
     for (const auto &reg : registers) {
         if (reg.second != 0) {
             std::cout << "R" << reg.first << " " << reg.second << "\n";
+            output << "R" << reg.first << " " << reg.second << "\n";
         }
     }
 
@@ -133,6 +132,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
     for (const auto &mem : memory) {
         if (mem.second != 0) {
             std::cout << mem.first << " " << mem.second << "\n";
+            output << mem.first << " " << mem.second << "\n";
         }
     }
 
@@ -143,6 +143,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
     }
 
     std::cout << "\nSIMULATION END\n";
+    output.close();
 }
 
 int main()
