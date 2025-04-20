@@ -119,7 +119,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
 
     // Print final register contents
     std::cout << "\nREGISTERS\n";
-    output << "\nREGISTERS\n";
+    output << "REGISTERS\n";
     for (const auto &reg : registers) {
         if (reg.second != 0) {
             std::cout << "R" << reg.first << " " << reg.second << "\n";
@@ -129,7 +129,7 @@ void runSimulation( std::unordered_map<int, int> &registers,
 
     // Print final memory contents
     std::cout << "\nMEMORY\n";
-    output << "\nMEMORY\n";
+    output << "MEMORY\n";
     for (const auto &mem : memory) {
         if (mem.second != 0) {
             std::cout << mem.first << " " << mem.second << "\n";
