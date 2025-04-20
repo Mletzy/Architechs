@@ -12,12 +12,9 @@ struct Instruction
 
     // Fields extracted from the binary instruction  -Jonathan Arc
     int opcode = 0;
-    int rs;
-    int rd;
-    int rt;
-    int shamt;
-    int func;
-    int immediate;
+    int rs = 0, rt = 0, rd = 0;
+    int shamt = 0, func = 0;
+    int immediate = 0;
 
     // Constructor: takes binary string + instruction ndex and immediately decodes it
     Instruction(const std::string &binary, int idx);
