@@ -78,14 +78,12 @@ ParsedInput Parser::parseInputFile(const std::string &filename)
             iss >> reg >> value; 
             
             // Make sure the register name starts with 'R'
-            /*
             if (reg[0] == 'R')
             {
                 int regNum = std::stoi(reg.substr(1)); 
                 if(regNum != 0) // R0 is always 0 in MIPS
                     data.registers[regNum] = value; // Convert to register (store int)
             }
-            */
 
         } else if (section == MEM) // Parse a memory line
         {
