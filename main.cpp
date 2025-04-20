@@ -30,26 +30,29 @@ void runSimulation( std::unordered_map<int, int> &registers,
         // Execute instruction
         switch (inst.opcode) 
         {
+        int offset;
+        int effAdd;
+
+
           case 0: //(opcode = 000000) For R-type instructions
-            /*if( inst.funct == 32 ) {//ADD (funct= 100000)
+            if( inst.func == 32 ) {//ADD (funct= 100000)
              //rd register will contain rs value + rt value
                registers[inst.rd] = registers[inst.rs] + registers[inst.rt];
                }
-               else if( inst.funct == 34 ) {//SUB (funct= 100010) -Jonathan Arc
+               else if( inst.func == 34 ) {//SUB (funct= 100010) -Jonathan Arc
                registers[inst.rd] = registers[inst.rs] - registers[inst.rt];
                }               
-            */
+
 
           break;
             case 4: // BEQ (opcode = 000100)
-              /*
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 cycle++;
                 if (registers[inst.rs] == registers[inst.rt]) {
                 pc += inst.immediate; // Branch if equal
                 }
                 break;
-              */
+
             case 5: // BNE (opcode = 000101)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 cycle++;
@@ -60,46 +63,42 @@ void runSimulation( std::unordered_map<int, int> &registers,
             case 8: //ADDI (opcode = 001000)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 cycle++;
-                /*
-                //rd = rs + imm;
+                 //rd = rs + imm;
                  registers[inst.rd] = registers[inst.rs] + inst.immediate;
-
-                */
-              
                 break;
+
           case 35: //LW (opcode = 100011) 
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-MEM");
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-WB");
                 
                 cycle++;
-                /*
                 //rd = rs + imm;
-                 registers[inst.rd] = registers[inst.rs] + inst.immediate;
-
-                */
-                int offset = inst.immediate;
-                int effAdd = offset + registers[inst.rs];
+                registers[inst.rd] = registers[inst.rs] + inst.immediate;
+                offset = inst.immediate;
+                effAdd = offset + registers[inst.rs];
                 if (effAdd % 4 != 0) {
                     std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
                     return;
                 }
                 registers[inst.rt] = memory[effAdd];
-                    
                 break;
 
-            case 43: //SW (opcode = 101011)
+            	case 43: //SW (opcode = 101011)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-MEM");
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-WB");
                 cycle++;
-                /*
+
                 //rd = rs + imm;
                  registers[inst.rd] = registers[inst.rs] + inst.immediate;
 
-                */
-                int offset = inst.immediate;
-                int effAdd = offset + registers[inst.rs];
+//                int offset = inst.immediate;
+//                int effAdd = offset + registers[inst.rs];
+                offset = inst.immediate;
+                effAdd = offset + registers[inst.rs];
+
+
                 if (effAdd % 4 != 0) {
                     std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
                     return;
