@@ -4,9 +4,10 @@
 #include "decoder.h"
 #include "instruction.h"
 
+
 //G.G changed the const for registers and memory so I could directly access them in SW and LW
-void runSimulation( std::unordered_map<int, int> &registers, 
-                    std::unordered_map<int, int> &memory, 
+void runSimulation( std::unordered_map<int, int> &registerMap,
+                    std::unordered_map<int, int> &memoryMap,
                    const std::vector<Instruction> &instructions)
 {
     std::cout << "\nSIMULATION START\n";
@@ -14,20 +15,48 @@ void runSimulation( std::unordered_map<int, int> &registers,
 
     int cycle = 1; // Tracks the clock cycle
     int pc = 0;    // Program counter (index of instruction)
+    int instruction=0; //Number of instructions printed.
 
     std::vector<std::string> timeline; // Store cycle-by-cycle execution
+
+    int registers[2][32]; // Array for holding Register data.
+    for(int i=0; i<32; i++){ // Registers array initialization
+    	registers[0][i]=0; // 0 in first index means unused. 1 means used.
+    	registers[1][i]=0; // Value stored in register.
+    }
+
+
+    for(const auto &reg : registerMap) {
+   	 registers[0][(reg.first)]=1; // Mark that register as having been used.
+	 registers[1][reg.first]=reg.second; // Store value from input file in register.
+    }
+
+    int memory[2][250]; // Array for holding Register data.
+    for(int i=0; i<250; i++){ // Registers array initialization
+    	memory[0][i]=0; // 0 in first index means unused. 1 means used.
+    	memory[1][i]=0; // Value stored in register.
+    }
+
+    for(const auto &mem : memoryMap) {
+   	 memory[0][(mem.first/4)]=1; // Mark that register as having been used.
+	 memory[1][mem.first/4]=mem.second; // Store value from input file in register.
+    }
+
+    /*
+     * These terms refer to the stages of the MIPS pipeline:
+     * Instruction Fetch (IF), Instruction Decode (ID), Execute (EX), Memory Access (MEM), and Write Back (WB).
+     */
 
     while (pc < instructions.size()) 
     {
         Instruction inst = instructions[pc];
-
+        instruction++;
         // Log cycles
-        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-IF");
+        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-IF");
         cycle++;
-        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-ID");
+        timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-ID");
         cycle++;
 
-    
         // Execute instruction
         switch (inst.opcode) 
         {
@@ -36,101 +65,81 @@ void runSimulation( std::unordered_map<int, int> &registers,
 
 
           case 0: //(opcode = 000000) For R-type instructions
+            timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
+            cycle++;
+            timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-WB");
+          	registers[0][inst.rd] = 1; // Mark as used.
             if( inst.func == 32 ) {//ADD (funct= 100000)
              //rd register will contain rs value + rt value
-               registers[inst.rd] = registers[inst.rs] + registers[inst.rt];
-                //Log remaining stages - Gregory Maddox 
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-EX");
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-WB");
+               registers[1][inst.rd] = registers[1][inst.rs] + registers[1][inst.rt];
+
                }
                else if( inst.func == 34 ) {//SUB (funct= 100010) -Jonathan Arc
-               registers[inst.rd] = registers[inst.rs] - registers[inst.rt];
-                //Log remaining stages - Gregory Maddox 
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-EX");
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-WB"); 
-               }  else {
-                std::cerr << "[ERROR] Unsupported R-type funct code: " << inst.func 
-                          << " in instruction I" << inst.index << std::endl;
-               } // Warning added - Gregory Maddox 
-               
-              
-
+               registers[1][inst.rd] = registers[1][inst.rs] - registers[1][inst.rt];
+               }               
           break;
+
             case 4: // BEQ (opcode = 000100)
-                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
-                cycle++;
-                if (registers[inst.rs] == registers[inst.rt]) {
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
+                //cycle++;
+                if (registers[1][inst.rs] == registers[1][inst.rt]) {
                 pc += inst.immediate; // Branch if equal
-                continue; // skip automatic pc++ - Gregory Maddox
                 }
                 break;
 
             case 5: // BNE (opcode = 000101)
-                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
-                cycle++;
-                if (registers[inst.rs] != registers[inst.rt]) {
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
+                //cycle++;
+                if (registers[1][inst.rs] != registers[1][inst.rt]) {
                     pc += inst.immediate; // Branch
-                    continue; // skip automatic pc++ - Gregory Maddox
                 }
                 break;
             case 8: //ADDI (opcode = 001000)
-                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-EX");
-                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(inst.index) + "-WB"); // Edited to include - Gregory M. 
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
                 cycle++;
                  //rd = rs + imm;
-                 registers[inst.rt] = registers[inst.rs] + inst.immediate; // edited to rt - Gregory M. 
+                 registers[0][inst.rt] = 1; //Mark register as in use.
+                 registers[1][inst.rt] = registers[1][inst.rs] + inst.immediate;
                 break;
 
           case 35: //LW (opcode = 100011) 
-              // Added cycle++ for separate cycle logging - Gregory Maddox  
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-EX");
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-MEM");
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-WB");
-                
-                // Calculate effective address - Gregory M. 
-                effAdd = registers[inst.rs] + inst.immediate;
-
-                /*
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
                 cycle++;
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-MEM");
+                cycle++;
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-WB");
+                
                 //rd = rs + imm;
-                registers[inst.rd] = registers[inst.rs] + inst.immediate;
+                registers[0][inst.rt] = 1; //Mark register as in use.
+                registers[1][inst.rt] = registers[1][inst.rs] + inst.immediate;
                 offset = inst.immediate;
-                effAdd = offset + registers[inst.rs];
-                */
-
+                effAdd = offset + registers[1][inst.rs];
                 if (effAdd % 4 != 0) {
                     std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
                     return;
                 }
-
-                registers[inst.rt] = memory[effAdd];
+                registers[1][inst.rt] = memory[1][(effAdd/4)];
                 break;
 
             	case 43: //SW (opcode = 101011)
-                //Added cycle++ for separate cycle logging - Gregory Maddox 
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-EX");
-                timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-MEM");
-                //No Write-back in SW - Gregory Maddox 
-                //timeline.push_back("C#" + std::to_string(cycle++) + " I" + std::to_string(inst.index) + "-WB");
-                
-                // Calculate effective memory address -  Gregory Maddox
-                effAdd = registers[inst.rs] + inst.immediate;
-                /*
-                 registers[inst.rd] = registers[inst.rs] + inst.immediate;
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
+                cycle++;
+                timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-MEM");
+
+                //rd = rs + imm;
+                registers[0][inst.rt] = 1; //Mark register as in use.
 
                 offset = inst.immediate;
-                effAdd = offset + registers[inst.rs];
-                */
+                effAdd = offset + registers[1][inst.rs];
+
 
                 if (effAdd % 4 != 0) {
                     std::cerr << "Unaligned memory access at address: " << effAdd << std::endl;
                     return;
                 }
-
-                memory[effAdd] = registers[inst.rt];
-
+                memory[0][(effAdd/4)] = 1; // Mark memory as in use.
+                memory[1][(effAdd/4)] = registers[1][inst.rt]; //Assign memory to location
                 break;
-          
         }
         cycle++;
         pc++; // Move to the next instruction
@@ -145,28 +154,30 @@ void runSimulation( std::unordered_map<int, int> &registers,
     // Print final register contents
     std::cout << "\nREGISTERS\n";
     output << "REGISTERS\n";
-    for (const auto &reg : registers) {
-        if (reg.second != 0) {
-            std::cout << "R" << reg.first << " " << reg.second << "\n";
-            output << "R" << reg.first << " " << reg.second << "\n";
+    for (int i=1; i<32; i++){
+        if (registers[0][i] == 1) {
+            std::cout << "R" << i << " " << registers[1][i] << "\n";
+            output << "R" << i << " " << registers[1][i] << "\n";
         }
     }
+
 
     // Print final memory contents
     std::cout << "\nMEMORY\n";
     output << "MEMORY\n";
-    for (const auto &mem : memory) {
-        if (mem.second != 0) {
-            std::cout << mem.first << " " << mem.second << "\n";
-            output << mem.first << " " << mem.second << "\n";
+    for (int i=1; i<250; i++){
+        if (memory[0][i] == 1) {
+            std::cout << i*4 << " " << memory[1][i] << "\n";
+            output << i*4 << " " << memory[1][i] << "\n";
         }
     }
 
     // Just print out the decoded instructions for now
-    for (const auto &inst : instructions)
-    {
-        std::cout << "I" << inst.index << " - Type: " << inst.type << ", Opcode: " << inst.opcode << "\n";
+    /*
+    for (const auto &inst : instructions){
+    	std::cout << "I" << inst.index << " - Type: " << inst.type << ", Opcode: " << inst.opcode << "\n";
     }
+    */
 
     std::cout << "\nSIMULATION END\n";
     output.close();
@@ -186,7 +197,7 @@ int main()
         // Step 2: Decode binary instructions into Instruction structs
         std::vector<Instruction> decoded = Decoder::decodeAll(parsed.binaryInstructions);
 
-        // Step 3: Run simulation logic (place holder)
+        // Step 3: Run simulation logic
         runSimulation(parsed.registers, parsed.memory, decoded);
 
         // Ask user if they want to simulate another file
@@ -196,6 +207,5 @@ int main()
         if (cont != "y")
             break;
     }
-
     return 0;
 }
