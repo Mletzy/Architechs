@@ -56,7 +56,8 @@ void runSimulation( std::unordered_map<int, int> &registerMap,
         cycle++;
         timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-ID");
         cycle++;
-
+        registers[0][0]=0; // Set R0 as unused (won't print)
+        registers[1][0]=0; // Set R0 to 0
         // Execute instruction
         switch (inst.opcode) 
         {
@@ -162,6 +163,9 @@ void runSimulation( std::unordered_map<int, int> &registerMap,
       output << entry << std::endl;
     }
 
+    registers[0][0]=0; // Set R0 as unused (won't print)
+    registers[1][0]=0; // Set R0 to 0
+	
     // Print final register contents
     std::cout << "\nREGISTERS\n";
     output << "REGISTERS\n";
