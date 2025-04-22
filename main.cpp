@@ -107,6 +107,7 @@ void runSimulation( std::unordered_map<int, int> &registerMap,
             case 8: //ADDI (opcode = 001000)
                 timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-EX");
                 cycle++;
+		timeline.push_back("C#" + std::to_string(cycle) + " I" + std::to_string(instruction) + "-WB");
                  //rd = rs + imm;
                  registers[0][inst.rt] = 1; //Mark register as in use.
                  registers[1][inst.rt] = registers[1][inst.rs] + inst.immediate;
